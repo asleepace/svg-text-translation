@@ -40,7 +40,7 @@ export async function fetchTranslations(message: string, options = { targetLocal
 }
 
 
-export async function translate(phrase: string[], options: Partial<TranslationBatch>): Promise<string[]> {
+export async function translate(phrase: string[], options: Partial<TranslationBatch>) {
   const arity = phrase.length
   const sentence = phrase.join(' ').trim()
 
@@ -54,25 +54,39 @@ export async function translate(phrase: string[], options: Partial<TranslationBa
   })
 
   const translatedWords = translation.split(' ')
+  const translatedSentence = translatedWords.join(' ')
 
-  return phrase.map((word, index) => {
+  console.log('[translation] original length: ', sentence.length)
+  console.log('[translation] translated length: ', translatedSentence.length)
+
+  const ratio = sentence.length / translatedSentence.length
+  console.log('[translation] ration: ', ratio)
+
+
+  const pairs = phrase.map((word, index) => {
 
     let numberOfCharactersToMatch = word.length
-    
     let replacement = translatedWords.shift()
 
     if (!replacement) {
       console.warn(`[translate] no translation found for "${word}"`)
-      return ''
+      return [word, ""]
     }
 
     while (replacement.length < numberOfCharactersToMatch) {
       console.log(`[translate] trying to match "${word}" with "${replacement}"`)
       const nextWord = translatedWords.shift()
-      if (!nextWord) return replacement
+      if (!nextWord) return [word, replacement]
       replacement += ` ${nextWord}`
     }
 
-    return replacement
+    return [word, replacement]
   })
+
+  return {
+    pairs,
+    ratio,
+    originalLength: sentence.length,
+    translatedLength: translatedSentence.length,
+  }
 }
