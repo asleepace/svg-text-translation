@@ -24,7 +24,9 @@ async function main() {
 
     if (!isTextSpan(node)) return // skip if not a text span
 
-    const { pairs, ratio } = await translate(node.tspan, { targetLocale: 'fr' })
+    const { pairs, ratio, originalLength, translatedLength } = await translate(node.tspan, { targetLocale: 'fr' })
+
+    const newNumberOfChars = (translatedLength - originalLength) * ratio
 
     let copy = text
 
@@ -39,14 +41,14 @@ async function main() {
     const originalFontSize = copy.match(fontSizeRegex)
 
     if (originalFontSize && originalFontSize.length > 1) {
-      const newFontSize = +originalFontSize[1] * ratio
+      const newFontSize = (+originalFontSize[1] * ratio) + newNumberOfChars
       console.log('newFontSize', newFontSize)
       copy = copy.replace(fontSizeRegex, `font-size="${newFontSize}"`)
     }
     
     console.log('originalFontSize', originalFontSize)
 
-    // Bun.write(`output_${+new Date}.svg`, copy)
+    Bun.write(`output_${+new Date}.svg`, copy)
   })
 }
 
