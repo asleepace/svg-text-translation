@@ -88,5 +88,6 @@ export async function translate(phrase: string[], options: Partial<TranslationBa
     ratio,
     originalLength: sentence.length,
     translatedLength: translatedSentence.length,
+    newNumberOfChars: (translatedSentence.length - sentence.length) * ratio,
   }
 }

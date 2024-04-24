@@ -8,50 +8,56 @@ import { XMLParser, validationOptions as ValidationOptions } from 'fast-xml-pars
 
 const parser = new XMLParser()
 
-
-async function main() {
-  const options = {
-    ignoreAttributes: false,
-    // attributeNamePrefix : "@_",
-    allowBooleanAttributes: true
-  };
-
-  const file = Bun.file(pathToSVG)
-  const text = await file.text()
-  const data = parser.parse(text, options)
-
-  walkTree(data, async (node) => {
-
-    if (!isTextSpan(node)) return // skip if not a text span
-
-    const { pairs, ratio, originalLength, translatedLength } = await translate(node.tspan, { targetLocale: 'fr' })
-
-    const newNumberOfChars = (translatedLength - originalLength) * ratio
-
-    let copy = text
-
-    pairs.forEach(([original, translation]) => {
-      console.log(`[translate] "${original}" => "${translation}"`)
-      copy = copy.replace(original, translation)
-    })
-
-    // console.log(copy)
-    const fontSizeRegex = new RegExp(/font-size="(.*?)"/)
-
-    const originalFontSize = copy.match(fontSizeRegex)
-
-    if (originalFontSize && originalFontSize.length > 1) {
-      const newFontSize = (+originalFontSize[1] * ratio) + newNumberOfChars
-      console.log('newFontSize', newFontSize)
-      copy = copy.replace(fontSizeRegex, `font-size="${newFontSize}"`)
-    }
-    
-    console.log('originalFontSize', originalFontSize)
-
-    Bun.write(`output_${+new Date}.svg`, copy)
-  })
+function writeDataToSVGFile(data: string) {
+  Bun.write(`./generated/translated_fr_${+new Date}.svg`, data)
 }
 
+function replaceTextInSVG(copy: string, pairs: string[][]) {
+  pairs.forEach(([original, translation]) => {
+    console.log(`[translate] "${original}" => "${translation}"`)
+    copy = copy.replace(original, translation)
+  })
+  return copy
+}
 
+function estimatedNewFontSize(copy: string, ratio: number, newNumberOfChars: number) {
+  const fontSizeRegex = new RegExp(/font-size="(.*?)"/)
+  const originalFontSize = copy.match(fontSizeRegex)
+  if (originalFontSize && originalFontSize.length > 1) {
+    const newFontSize = (+originalFontSize[1] * ratio) + newNumberOfChars
+    console.log('newFontSize', newFontSize)
+    copy = copy.replace(fontSizeRegex, `font-size="${newFontSize}"`)
+  }
+  return copy
+}
 
-main()
+const options = {
+  ignoreAttributes: false,
+  // attributeNamePrefix : "@_",
+  allowBooleanAttributes: true
+};
+
+// Step 1: Load the SVG file and extract the text content
+const { data, text } = await extractTextFromSVG(pathToSVG, options)
+
+// Step 2: Walk the SVG tree and find text spans
+const results = await walkTree(data, async (node) => {
+
+  if (!isTextSpan(node)) return // skip if not a text span
+
+  return node.tspan
+
+  // Step 3: Translate the text span and attempt to match word lengths
+  const { pairs, ratio, newNumberOfChars } = await translate(node.tspan, { targetLocale: 'fr' })
+
+  // Step 4: Replace the text in the SVG file
+  const copy = replaceTextInSVG(text, pairs)
+
+  // Step 5: Resize the font size based on the new number of characters
+  const resizedCopy = estimatedNewFontSize(copy, ratio, newNumberOfChars)
+
+  // Step 6: Write the new SVG file to disk
+  writeDataToSVGFile(resizedCopy)
+})
+
+console.log('results', results)
