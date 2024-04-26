@@ -13,6 +13,10 @@ export function processArgs() {
         type: 'string',
         short: 'o'
       },
+      fontScale: {
+        type: 'string',
+        short: 'f',
+      },
       verbose: {
         type: 'boolean',
         short: 'v',
@@ -36,5 +40,6 @@ export function processArgs() {
     pathToFile,
     targetLocale: values.locale,
     outputPath: values.outputPath,
+    fontScale: values.fontScale ? parseFloat(values.fontScale) : undefined,
   }
 }

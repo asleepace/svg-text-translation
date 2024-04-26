@@ -15,6 +15,7 @@ export type SVGTranslationOptions<T> = {
   outputPath?: string | URL
   targetLocale: string
   selectors: PhraseSelector[]
+  fontScale?: number
 }
 
 export type Write = {
@@ -22,7 +23,7 @@ export type Write = {
   translation: string
 }
 
-export async function translateSVG<T>({ pathToFile, selectors, targetLocale, outputPath }: SVGTranslationOptions<T>) {
+export async function translateSVG<T>({ pathToFile, selectors, targetLocale, outputPath, fontScale }: SVGTranslationOptions<T>) {
   const file = Bun.file(pathToFile)
   const parser = new XMLParser()
   const text = await file.text()
@@ -39,9 +40,9 @@ export async function translateSVG<T>({ pathToFile, selectors, targetLocale, out
   let copy = text
 
   for await (const phrase of selections) {
-    const { pairs, ratio, newNumberOfChars } = await translate(phrase.tspan, { targetLocale, translator: 'any' })
+    const { pairs } = await translate(phrase.tspan, { targetLocale, translator: 'any' })
     copy = replaceTextInSVG(text, pairs)
-    copy = estimateFontSize(copy, ratio, newNumberOfChars)
+    copy = estimateFontSize(copy, pairs, fontScale)
   }
 
   Bun.write(fileName, copy)
