@@ -2,6 +2,9 @@
   "name": "svg-text-translation",
   "module": "index.ts",
   "type": "module",
+  "scripts": {
+    "translate": "bun run index.ts"
+  },
   "devDependencies": {
     "bun-types": "latest"
   },

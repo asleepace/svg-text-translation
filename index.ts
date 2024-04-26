@@ -1,57 +1,10 @@
-import pathToSVG from './assets/example.svg'
-import { extractTextFromSVG } from './src/extract'
-import { isTextSpan } from './src/selectors'
-import { walkTree } from './src/walkTree'
-import { translate } from './src/translate'
-import { XMLBuilder } from 'fast-xml-parser'
-import { XMLParser, validationOptions as ValidationOptions } from 'fast-xml-parser'
+import { translateSVG, isTextSpan, openImagePreview, processArgs } from "./src"
 
-const parser = new XMLParser()
+// Step 1: Load the SVG file and extract the text content
+const { pathToFile, outputPath, targetLocale } = processArgs()
 
+// Step 3: Translate the SVG file
+const output = await translateSVG({ pathToFile, targetLocale, outputPath, selectors: [isTextSpan] })
 
-async function main() {
-  const options = {
-    ignoreAttributes: false,
-    // attributeNamePrefix : "@_",
-    allowBooleanAttributes: true
-  };
-
-  const file = Bun.file(pathToSVG)
-  const text = await file.text()
-  const data = parser.parse(text, options)
-
-  walkTree(data, async (node) => {
-
-    if (!isTextSpan(node)) return // skip if not a text span
-
-    const { pairs, ratio, originalLength, translatedLength } = await translate(node.tspan, { targetLocale: 'fr' })
-
-    const newNumberOfChars = (translatedLength - originalLength) * ratio
-
-    let copy = text
-
-    pairs.forEach(([original, translation]) => {
-      console.log(`[translate] "${original}" => "${translation}"`)
-      copy = copy.replace(original, translation)
-    })
-
-    // console.log(copy)
-    const fontSizeRegex = new RegExp(/font-size="(.*?)"/)
-
-    const originalFontSize = copy.match(fontSizeRegex)
-
-    if (originalFontSize && originalFontSize.length > 1) {
-      const newFontSize = (+originalFontSize[1] * ratio) + newNumberOfChars
-      console.log('newFontSize', newFontSize)
-      copy = copy.replace(fontSizeRegex, `font-size="${newFontSize}"`)
-    }
-    
-    console.log('originalFontSize', originalFontSize)
-
-    Bun.write(`output_${+new Date}.svg`, copy)
-  })
-}
-
-
-
-main()
+// Step 4: Open the image preview
+await openImagePreview(output)
