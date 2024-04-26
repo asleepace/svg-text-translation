@@ -1,3 +1,4 @@
+export { processArgs } from './utilities/processArgs'
 export { translateSVG } from './translate/translateSVG'
 export { isTextSpan } from './selectors/isTextSpan'
 
