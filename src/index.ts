@@ -4,6 +4,7 @@ import { walk, Selector } from "./walk";
 import { fetchTranslations } from "./translate";
 import { estimateFontSize } from "./estimateFontSize";
 import { writeDataToSVGFile } from "./writeDataToSVG";
+import { getFileName } from "./getFileName";
 import { translate } from './translate'
 
 export type Transformer<T> = (node: T) => string
@@ -16,14 +17,6 @@ export type SVGTranslationOptions<T> = {
   outputPath?: string | URL
   targetLocale: string
   selectors: PhraseSelector[]
-}
-
-function textSpanToString({ tspan }: SVGPhrase) {
-  return tspan.join(' ')
-}
-
-function matchPairs(original: string, translation: string): string[][] {
-  return [[original, translation]]
 }
 
 function replaceTextInSVG(copy: string, pairs: string[][]) {
@@ -39,7 +32,7 @@ export type Write = {
   translation: string
 }
 
-export async function translateSVG<T>({ pathToFile, selectors, targetLocale }: SVGTranslationOptions<T>) {
+export async function translateSVG<T>({ pathToFile, selectors, targetLocale, outputPath }: SVGTranslationOptions<T>) {
   const file = Bun.file(pathToFile)
   const parser = new XMLParser()
   const text = await file.text()
@@ -49,14 +42,19 @@ export async function translateSVG<T>({ pathToFile, selectors, targetLocale }: S
   const selections = walk(data, selectors)
   console.log('[translations] found selections:', selections)
 
-  let copy = text, fileName = ''
+  // Generate output file name
+  const fileName = getFileName({ pathToFile, outputPath, targetLocale })
 
-  selections.forEach(async (phrase) => {
+  // copy of the original text and output file name
+  let copy = text
+
+  for await (const phrase of selections) {
     const { pairs, ratio, newNumberOfChars } = await translate(phrase.tspan, { targetLocale, translator: 'any' })
     copy = replaceTextInSVG(text, pairs)
-    const resizedCopy = estimateFontSize(copy, ratio, newNumberOfChars)
-    fileName = writeDataToSVGFile(resizedCopy)
-  })
+    copy = estimateFontSize(copy, ratio, newNumberOfChars)
+  }
+
+  Bun.write(fileName, copy)
 
   return fileName
 }
