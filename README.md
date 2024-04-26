@@ -6,9 +6,9 @@ a simple utility for internationalizing text in SVG images
 bun translate <svg-file> --locale <locale> [--output <output-file>] [--verbose]
 ```
 
-| Package | Version | Website |
-| --- | --- | --- |
-| `bun` | `1.1.5` | [documentation](https://bun.sh/) |
+| Package | Version |
+|     --- |     --- |
+| [Bun]((https://bun.sh/) | `1.1.5` |
 
 
 ## Example Usage
