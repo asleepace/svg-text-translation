@@ -1,7 +1,4 @@
-import { translateSVG } from "./src"
-import { isTextSpan } from "./src/selectors"
-import { parseArgs } from "util";
-import { $ } from "bun";
+import { translateSVG, isTextSpan, openImagePreview } from "./src"
 
 // Step 1: Load the SVG file and extract the text content
 const [_0, _1, pathToFile, ...params ] = Bun.argv
@@ -20,7 +17,4 @@ if (localeIndex !== -1) {
 // Step 3: Translate the SVG file
 const output = await translateSVG({ pathToFile, targetLocale, selectors: [isTextSpan] })
 
-// Step 4: Open the output file
-await $`open ${output}`
-
-console.log('[svg-text-translation] output:', output)
+await openImagePreview(output)
