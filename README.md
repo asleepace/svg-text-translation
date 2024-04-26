@@ -2,7 +2,7 @@
 
 | Package | Version |
 |     --- |     --- |
-| [Bun]((https://bun.sh/) | `1.1.5` |
+| [Bun](https://bun.sh/) | `1.1.5` |
 
 a simple utility for internationalizing text in SVG images
 
