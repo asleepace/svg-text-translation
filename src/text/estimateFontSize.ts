@@ -2,24 +2,9 @@
 
 export function estimateFontSize(copy: string, pairs: string[][], fontScale?: number) {
 
-  console.log('[estimateFontSize] fontScale:', fontScale)
-
   // calculate ratio
-  const ratio = fontScale ?? pairs.reduce((acc, [original, translation]) => {
-    const originalLength = original.length
-    const translationLength = translation.length
-
-    console.log('[estimateFontSize] original:', [originalLength, translationLength, originalLength / translationLength])
-
-    if (originalLength === 0) return acc
-    if (translationLength === 0) return acc
-
-    const ratio = (originalLength / translationLength)
-    return Math.min(acc, ratio)
-  }, 1)
-
+  const ratio = fontScale ?? 0.9
   console.log('[estimateFontSize] ratio:', ratio)
-
 
   const fontSizeRegex = new RegExp(/font-size="(.*?)"/)
   const matches = copy.match(fontSizeRegex)
@@ -38,6 +23,7 @@ export function estimateFontSize(copy: string, pairs: string[][], fontScale?: nu
   const fontPositionRegex = new RegExp(/<tspan x="(.*?)"/g)
   const positions = copy.match(fontPositionRegex)
 
+  // translate each position
   positions?.forEach((position, index) => {
     if (index >= pairs.length) return
 
