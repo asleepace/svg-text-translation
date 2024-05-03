@@ -3,6 +3,7 @@ import { walk } from "../logic/walk";
 import { estimateFontSize } from "../text/estimateFontSize";
 import { getFileName } from "../utilities/getFileName";
 import { replaceTextInSVG } from "../text/replaceTextInSVG";
+import { findBestFit } from "../logic/findBestFit";
 import { translate } from './translate'
 
 export type Transformer<T> = (node: T) => string

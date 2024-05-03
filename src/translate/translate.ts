@@ -1,4 +1,5 @@
 import { fetchTranslations } from "./fetchTranslations"
+import { findBestFit } from "../logic/findBestFit"
 
 export type TranslationTask = {
   message: string
@@ -31,6 +32,11 @@ export async function translate(phrase: string[], options: Partial<TranslationBa
   const translatedWords = translation.split(' ')
   const translatedSentence = translatedWords.join(' ')
 
+  const output = findBestFit({ currentWords: translatedWords, targetSizes: phrase.map((word) => word.length) })
+  console.log("[translate] best fit: ", output)
+
+  const pairs = phrase.map((word, index) => [word, output[index]])
+
   console.log('[translation] original length: ', sentence.length)
   console.log('[translation] translated length: ', translatedSentence.length)
 
@@ -38,25 +44,25 @@ export async function translate(phrase: string[], options: Partial<TranslationBa
   console.log('[translation] ration: ', ratio)
 
 
-  const pairs = phrase.map((word, index) => {
+  // const pairs = phrase.map((word, index) => {
 
-    let numberOfCharactersToMatch = word.length
-    let replacement = translatedWords.shift()
+  //   let numberOfCharactersToMatch = word.length
+  //   let replacement = translatedWords.shift()
 
-    if (!replacement) {
-      console.warn("[translate] no translation found for ", word)
-      return [word, ""]
-    }
+  //   if (!replacement) {
+  //     console.warn("[translate] no translation found for ", word)
+  //     return [word, ""]
+  //   }
 
-    while (replacement.length < numberOfCharactersToMatch) {
-      console.log("[translate] trying to match ", [word, replacement])
-      const nextWord = translatedWords.shift()
-      if (!nextWord) return [word, replacement]
-      replacement += ` ${nextWord}`
-    }
+  //   while (replacement.length < numberOfCharactersToMatch) {
+  //     console.log("[translate] trying to match ", [word, replacement])
+  //     const nextWord = translatedWords.shift()
+  //     if (!nextWord) return [word, replacement]
+  //     replacement += ` ${nextWord}`
+  //   }
 
-    return [word, replacement]
-  })
+  //   return [word, replacement]
+  // })
 
   return {
     pairs,

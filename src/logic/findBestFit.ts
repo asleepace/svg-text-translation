@@ -36,7 +36,7 @@ export type BestFitParams = {
  * and should be used sparingly, as it will try every possible combination of partitions to find 
  * the best fit.
  */
-export function findBestFit({ currentWords, targetSizes }: BestFitParams): number[][] {
+export function findBestFit({ currentWords, targetSizes }: BestFitParams): string[] {
   const currentWordLengths = currentWords.map((word) => word.length)
   let shortedDistance: number = Infinity
   let bestFitSolution: number[][] = []
@@ -51,5 +51,25 @@ export function findBestFit({ currentWords, targetSizes }: BestFitParams): numbe
       bestFitSum = totalSum
     }
   })
-  return bestFitSolution
+  
+  console.log('[findBestFit] best fit sum: ', bestFitSum)
+  const output: string[][] = [[]]
+
+  let targetLength = bestFitSum[0]
+  let index = 0
+  
+  currentWords.forEach((word) => {
+    console.log('[findBestFit] target length: ', targetLength, 'word: ', word)
+    targetLength -= word.length
+    output[index].push(word)
+
+    if (targetLength <= 0) {
+      index++
+      targetLength = bestFitSum[index]
+      output.push([])
+    }
+  })
+
+  console.log('[findBestFit] best fit: ', output)
+  return output.map((s) => s.join(' '))
 }
