@@ -1,13 +1,11 @@
 import { XMLParser } from "fast-xml-parser"
 import { walk } from "../logic/walk";
-import { estimateFontSize } from "../text/estimateFontSize";
+import { estimateFontSize } from "../text/estimateFontSize"
 import { getFileName } from "../utilities/getFileName";
-import { replaceTextInSVG } from "../text/replaceTextInSVG";
-import { findBestFit } from "../logic/findBestFit";
+import { replaceTextInSVG } from "../text/replaceTextInSVG"
 import { translate } from './translate'
 
 export type Transformer<T> = (node: T) => string
-
 export type PhraseSelector = (node: unknown) => node is SVGPhrase
 export type PhraseTransform = (node: SVGPhrase[]) => string[]
 
