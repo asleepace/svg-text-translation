@@ -20,8 +20,8 @@ export async function translate(phrase: string[], options: Partial<TranslationBa
   const arity = phrase.length
   const sentence = phrase.join(' ').trim()
 
-  console.log("+ - ".repeat(20))
-  console.log("[translate] translating ", sentence)
+  //console.log("+ - ".repeat(20))
+  //console.log("[translate] translating ", sentence)
 
   const translation = await fetchTranslations(sentence, {
     targetLocale: 'fr',
@@ -38,10 +38,14 @@ export async function translate(phrase: string[], options: Partial<TranslationBa
   const pairs = phrase.map((word, index) => [word, output[index]])
 
   console.log('[translation] original length: ', sentence.length)
-  console.log('[translation] translated length: ', translatedSentence.length)
+  console.log('[translation] transltd length: ', translatedSentence.length)
 
   const ratio = sentence.length / translatedSentence.length
-  console.log('[translation] ration: ', ratio)
+  const numberOfDifferentCharacters = sentence.length - translatedSentence.length
+  const scale = sentence.length >= translatedSentence.length ? 1 : -1
+  console.log('[translation] ratio: ', ratio)
+  console.log('[translation] number of different characters: ', numberOfDifferentCharacters)
+  console.log('[translation] scaling ', [scale < 0 ? 'down' : 'up'])
 
 
   // const pairs = phrase.map((word, index) => {
@@ -70,5 +74,7 @@ export async function translate(phrase: string[], options: Partial<TranslationBa
     originalLength: sentence.length,
     translatedLength: translatedSentence.length,
     newNumberOfChars: (translatedSentence.length - sentence.length) * ratio,
+    numberOfDifferentCharacters,
+    scale,
   }
 }
