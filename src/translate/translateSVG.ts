@@ -1,12 +1,9 @@
 import { XMLParser } from "fast-xml-parser"
 import { walk } from "../logic/walk";
-import { estimateFontSize } from "../text/estimateFontSize"
-import { getFileName } from "../utilities/getFileName";
-import { replaceTextInSVG } from "../text/replaceTextInSVG"
+import { getFileName } from "../utilities/getFileName"
 import { translate } from './translate'
 
 import { replaceWithTemplate } from "../text/replaceWithTemplate";
-import { origin } from "bun";
 
 export type Transformer<T> = (node: T) => string
 export type PhraseSelector = (node: unknown) => node is SVGPhrase
@@ -45,12 +42,7 @@ export async function translateSVG<T>({ pathToFile, selectors, targetLocale, out
   // segments of text if needed.
   for await (const phrase of selections) {
     const { pairs, scale, numberOfDifferentCharacters } = await translate(phrase.tspan, { targetLocale, translator: 'any' })
-
     const newLines = pairs.map(([_, translation]) => translation)
-    // const maxCharacterDifference = pairs.map(([original, translation]) => {
-    //   return Math.abs((original?.length ?? 0) - (translation?.length ?? 0))
-    // }).reduce((a, b) => Math.max(a, b), 0)
-
     console.log('[translations] maxCharacterDifference:', numberOfDifferentCharacters)
     console.log('[translations] translations:', newLines)
 
@@ -58,8 +50,6 @@ export async function translateSVG<T>({ pathToFile, selectors, targetLocale, out
     console.log('[translations] calculatedFontSize:', calculatedFontSize)
 
     copy = replaceWithTemplate(copy, newLines, { fontSize: fontSize ?? calculatedFontSize })
-    // copy = replaceTextInSVG(text, pairs)
-    // copy = estimateFontSize(copy, pairs, fontScale)
   }
 
   Bun.write(fileName, copy)
