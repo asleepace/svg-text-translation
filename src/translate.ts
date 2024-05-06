@@ -1,5 +1,5 @@
 import { fetchTranslations } from "./fetchTranslations"
-import { findBestFit } from "../logic/findBestFit"
+import { findBestFit } from "./findBestFit"
 
 export type TranslationTask = {
   message: string

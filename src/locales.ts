@@ -1,7 +1,9 @@
 
 /**
- * The following is a list of supported locales for the translation service.
- * https://padlet.help/l/en/article/ybz2rt13bk-do-you-have-it-in-my-language
+ * Supported Locales 
+ * 
+ * The following is a list of 40 supported locales for the translation service.
+ * documentation: https://padlet.help/l/en/article/ybz2rt13bk-do-you-have-it-in-my-language
  */
 export const locales = [
   {"language": "Arabic", "locale": "ar"},
@@ -35,7 +37,7 @@ export const locales = [
   {"language": "Japanese", "locale": "ja"},
   {"language": "Turkish", "locale": "tr"},
   {"language": "Spanish", "locale": "es"},
-  {"language": "Korean", "locale": "ko"},
+  {"language": "Korean", "locale": "ko", fontSize: 90 },
   {"language": "Ukrainian", "locale": "uk"},
   {"language": "Estonian", "locale": "et"},
   {"language": "Latvian", "locale": "lv"},

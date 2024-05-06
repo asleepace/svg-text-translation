@@ -1,5 +1,8 @@
-import { translateSVG, isTextSpan, openImagePreview, processArgs, locales } from "./src"
-
+import { openImagePreview } from "./src/openImagePreview"
+import { translateTextInSVG } from "./src/translateTextInSVG"
+import { processArgs } from "./src/processArgs"
+import { isTextSpan } from "./src/isTextSpan"
+import { locales } from "./src/locales"
 
 //  Process Arguments
 //
@@ -19,19 +22,23 @@ const args = processArgs()
 //
 if (args.targetLocale === 'all') {
 
-  const operations = locales.map(async ({ locale }) => {
-    const output = await translateSVG({ ...args, targetLocale: locale, selectors: [isTextSpan] })
+  const operations = locales.map(async ({ locale: targetLocale, fontSize }) => {
+    const output = await translateTextInSVG({ ...args, targetLocale, fontSize, selectors: [isTextSpan] })
     return openImagePreview(output)
   })
 
   const result = await Promise.allSettled(operations)
-  result.forEach((task) => console.log(task.status))
+  result.forEach((task, index) => {
+    if (task.status === 'fulfilled') return
+    const option = locales[index]
+    console.error(`[error] failed translating to ${option.language} (${option.locale})`, task.reason)
+  })
 
 //  Single Translation
 //  If the targetLocale is not 'all', then we will translate the SVG file to the target locale
 //  and open the image in the browser
 } else {
-  const output = await translateSVG({ ...args, selectors: [isTextSpan] })
+  const output = await translateTextInSVG({ ...args, selectors: [isTextSpan] })
   await openImagePreview(output)
 }
 

@@ -3,7 +3,8 @@
   "module": "index.ts",
   "type": "module",
   "scripts": {
-    "translate": "bun run index.ts"
+    "translate": "bun run index.ts",
+    "demo": "bun run translate ./assets/example.svg --locale all --verbose"
   },
   "devDependencies": {
     "bun-types": "latest"

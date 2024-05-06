@@ -1,7 +1,13 @@
 import { parseArgs } from "util";
 
+export type ProgramArguments = {
+  pathToFile: string
+  targetLocale: string
+  outputPath?: string
+  fontSize?: number
+}
 
-export function processArgs() {
+export function processArgs(): ProgramArguments {
   const { values, positionals } = parseArgs({
     args: Bun.argv,
     options: {
